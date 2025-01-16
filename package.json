@@ -6,15 +6,12 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "serve": "turbo run serve",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare": "husky install",
-    "postprepare": "bash -c 'chmod ug+x .husky/*'"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",
     "eslint": "^8.48.0",
-    "husky": "^8.0.0",
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
     "tsc-alias": "^1.8.10",
@@ -27,13 +24,23 @@
     "apps/*",
     "packages/*"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "npx lint-staged"
-    }
-  },
   "dependencies": {
     "@types/axios": "^0.14.0",
     "axios": "^1.7.2"
-  }
+  },
+  "version": "1.0.0",
+  "description": "This project uses React.js with NextJS for the frontend, Express.js for the backend, and TurboRepo for monorepo management, facilitating rapid development of a scalable web application with streamlined collaboration and efficient server-client interactions.",
+  "main": "commitlint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ceng-pahmi/event-managemant03.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ceng-pahmi/event-managemant03/issues"
+  },
+  "homepage": "https://github.com/Ceng-pahmi/event-managemant03#readme"
 }
