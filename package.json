@@ -29,5 +29,20 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "axios": "^1.7.2"
-  }
+  },
+  "version": "1.0.0",
+  "description": "This project uses React.js with NextJS for the frontend, Express.js for the backend, and TurboRepo for monorepo management, facilitating rapid development of a scalable web application with streamlined collaboration and efficient server-client interactions.",
+  "main": "commitlint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ceng-pahmi/event-managemant03.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ceng-pahmi/event-managemant03/issues"
+  },
+  "homepage": "https://github.com/Ceng-pahmi/event-managemant03#readme"
 }
