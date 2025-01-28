@@ -13,6 +13,49 @@ model User {
   last_name     String
   email         String @unique
   password      String
-  referral_code  String? // New field for the referral code
+  referral_code String?
+  role          String
+  events        Event[] @relation("OrganizerEvents")
   @@map("users")
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  image       String?
+  date        DateTime
+  time        String
+  location    String
+  price       Float
+  category    String
+  organizerId Int
+  organizer   User?    @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  reviews     Review[]
+  promotions  Promotion[]
+  @@map("events")
+}
+
+model Promotion {
+  id                Int      @id @default(autoincrement())
+  code              String
+  discountPercentage Float
+  maxUses           Int
+  currentUses       Int
+  validUntil        DateTime
+  referralCode      String?
+  event             Event?   @relation(fields: [eventId], references: [id])
+  eventId          Int?
+  @@map("promotions")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  rating     Int
+  comment    String
+  createdAt DateTime @default(now())
+  event     Event?   @relation(fields: [eventId], references: [id])
+  eventId   Int?
+  @@map("reviews")
 }

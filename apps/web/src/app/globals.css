@@ -3,19 +3,50 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 240, 240, 240; /* Light foreground for dark theme */
+  --background-start-rgb: 30, 30, 30; /* Dark background */
+  --background-end-rgb: 50, 50, 50; /* Slightly lighter dark background */
+  --accent-color: rgb(173, 216, 230); /* Pastel blue accent */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 240, 240, 240; /* Light foreground for dark theme */
+    --background-start-rgb: 30, 30, 30; /* Dark background */
+    --background-end-rgb: 50, 50, 50; /* Slightly lighter dark background */
+    --accent-color: rgb(173, 216, 230); /* Pastel blue accent */
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  :root {
+    --background: 0 0% 10%; /* Dark background */
+    --foreground: 0 0% 100%; /* Light foreground */
+    --card: 0 0% 15%; /* Dark card */
+    --card-foreground: 0 0% 100%; /* Light card foreground */
+    --border: 0 0% 20%; /* Dark border */
+    --input: 0 0% 20%; /* Dark input */
+    --ring: 0 0% 30%; /* Dark ring */
+    --radius: 0.5rem; /* Border radius */
+    --accent: var(--accent-color); /* Pastel blue accent */
+  }
+  .dark {
+    --background: 0 0% 10%; /* Dark background */
+    --foreground: 0 0% 100%; /* Light foreground */
+    --card: 0 0% 15%; /* Dark card */
+    --card-foreground: 0 0% 100%; /* Light card foreground */
+    --border: 0 0% 20%; /* Dark border */
+    --input: 0 0% 20%; /* Dark input */
+    --ring: 0 0% 80%; /* Dark ring */
+    --accent: var(--accent-color); /* Pastel blue accent */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
