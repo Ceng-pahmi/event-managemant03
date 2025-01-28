@@ -1,30 +1,38 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '../components/ui/button';
+import { Calendar } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { Input } from './ui/input';
 
 interface MainNavProps {
   onAuthClick: () => void;
+  isLoggedIn: boolean;
 }
 
-export function MainNav({ onAuthClick }: MainNavProps) {
-  const handleAuthClick = () => {
-    console.log("Auth button clicked");
-    onAuthClick();
+export function MainNav({ onAuthClick, isLoggedIn }: MainNavProps) {
+  const [isProfilePopupOpen, setProfilePopupOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    setProfilePopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setProfilePopupOpen(false);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="flex h-16 items-center justify-between max-w-full">
         <div className="mr-8 flex items-center space-x-2">
-          <Calendar className="h-6 w-6" />
-          <span className="hidden font-bold sm:inline-block">EventHub</span>
+          <Calendar className="h-9 w-10" />
+          <span className="hidden font-bold sm:inline-block">
+            <Link href="/">EventHub</Link>
+          </span>
         </div>
-        <nav className="flex flex-1 items-center space-x-6 text-sm font-medium">
-          <Link href="/" className="transition-colors hover:text-foreground/80">
-            Home
-          </Link>
+        <nav className="flex flex-1 items-center space-x-7 text-sm font-medium">
           <Link
             href="/events"
             className="transition-colors hover:text-foreground/80"
@@ -32,23 +40,35 @@ export function MainNav({ onAuthClick }: MainNavProps) {
             Events
           </Link>
           <Link
-            href="/organizers"
+            href="/CreateEvent"
             className="transition-colors hover:text-foreground/80"
           >
-            Organizers
+            Create Event
           </Link>
           <Link
-            href="/about"
+            href="/help"
             className="transition-colors hover:text-foreground/80"
           >
-            About
+            Help Center
           </Link>
+          <Link
+            href="/tickets"
+            className="transition-colors hover:text-foreground/80"
+          >
+            Find My Tickets
+          </Link>
+          <div className="grid gap-4 md:grid-cols-[1fr,auto,auto] items-end">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search events..." className="pl-9" />
+            </div>
+          </div>
         </nav>
-        <div className="register flex items-center space-x-4 justify-end absolute right-5">
-          <Button variant="ghost" onClick={handleAuthClick}>
+        <div className="flex items-center space-x-4 ml-auto">
+          <Button variant="ghost" onClick={onAuthClick}>
             Sign In
           </Button>
-          <Button onClick={handleAuthClick}>Get Started</Button>
+          <Button onClick={onAuthClick}>Get Started</Button>
         </div>
       </div>
     </header>

@@ -1,24 +1,24 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import router from "./routes/userRoutes";
+import userRouter from "./routes/userRoutes";
+import eventRouter from "./routes/eventRoute";
 import dotenv from "dotenv";
-import cors from "cors"
+import cors from "cors";
+import path from "path";
 
-dotenv.config(); // Load environment variables
-
+dotenv.config(); 
 const app = express();
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
-app.use("/api/users", router);
+app.use("/api/users", userRouter);
+app.use("/api/events", eventRouter);
+
+app.use('/uploads', express.static('uploads'));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
-
-// Removed the redundant registration route
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

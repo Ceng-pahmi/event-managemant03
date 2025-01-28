@@ -1,26 +1,46 @@
 "use client";
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "./../components/ui/dialog";
+import { useRouter } from "next/navigation"; 
+
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "./../components/ui/tabs";
-import { Button } from "./../components/ui/button";
-import { Input } from "./../components/ui/input";
-import { Label } from "./../components/ui/label";
+} from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Cookies from "js-cookie"; 
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
+export const AuthDialog: React.FC<AuthDialogProps> = ({
+  open,
+  onOpenChange,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+  const [role, setRole] = useState("");
+  const router = useRouter(); 
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,13 +68,18 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && password === body.password) {
         console.log("Success:", data);
+        Cookies.set("token", data.token);
+        onOpenChange(false);
+        router.push("/");
       } else {
-        console.error("Error:", data.message);
+        alert("email or password is incorrect");
+        router.push("/")
+        AuthDialog;
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error during login:", error);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +88,8 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
+    console.log("Selected Role:", role);
 
     const url = "http://localhost:5000/api/users/register";
 
@@ -78,7 +105,17 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
       password,
       first_name,
       last_name,
+      role,
       referralCode,
+    };
+
+    const clearForm = () => {
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+      setReferralCode("");
+      setRole("");
     };
 
     try {
@@ -94,11 +131,16 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
 
       if (response.ok) {
         console.log("Success:", data);
-      } else {
+        onOpenChange(false);
+        router.push("/");
+      } else if(email === body.email){
+        alert("Email already exists");
+        clearForm()
+      }else {
         console.error("Error:", data.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error during registration:", error);
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +189,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full border" disabled={isLoading}>
                 {isLoading ? "Loading..." : "Login"}
               </Button>
             </form>
@@ -211,6 +253,19 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
                 </div>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select value={role} onValueChange={(value) => setRole(value)} defaultValue="User">
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-neutral-900">
+                    <SelectItem value="admin">admin</SelectItem>
+                    <SelectItem value="User">User</SelectItem>
+                    <SelectItem value="EventOrganizer">Event Organizer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="referralCode">Referral Code</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -223,7 +278,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full border" disabled={isLoading}>
                 {isLoading ? "Loading..." : "Register"}
               </Button>
             </form>

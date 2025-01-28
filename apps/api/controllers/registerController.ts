@@ -27,7 +27,8 @@ export const registerUser = async (
     return;
   }
 
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, role } = req.body;
+  console.log("received role:", role)
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,6 +39,7 @@ export const registerUser = async (
         last_name,
         email,
         password: hashedPassword,
+        role,
         referral_code: referralCode
       },
     });

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/registerController"; // Updated import
-import { loginUser } from "../controllers/loginController"; // Updated import
+import { registerUser } from "../controllers/registerController";
+import { loginUser } from "../controllers/loginController";
 import { body } from "express-validator";
-import { authenticateToken } from "../middleware/authMiddleware"; // Import the middleware
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
 
