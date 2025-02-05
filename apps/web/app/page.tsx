@@ -1,144 +1,98 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import {
-  MapPin,
-  Search,
-  Ticket,
-  Users,
-  Calendar,
-  ArrowRight,
-} from "lucide-react";
-import Link from "next/link";
-import { AuthDialog } from "../components/auth-dialog";
-import { MainNav } from "../components/main-nav";
-import { Footer } from "../components/footer";
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Cookies from 'js-cookie';
+import { AuthDialog } from '../components/auth-dialog';
+import { MainNav } from '../components/main-nav';
+import { MainNavToken } from '../components/main-nav-after-token';
+import { Footer } from '../components/footer';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-} from "../components/ui/carousel";
+} from '../components/ui/carousel';
+import { Calendar, MapPin, Ticket, Users } from 'lucide-react';
+import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
 
-const eventsData = [
-  {
-    id: 1,
-    title: "Tech Innovation Summit 2024",
-    date: "Apr 15, 2024",
-    location: "Jakarta",
-    price: "Rp 1.500.000",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&h=600&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Art & Culture Festival",
-    date: "May 20, 2024",
-    location: "Bali",
-    price: "Rp 750.000",
-    image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=1000&h=600&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Sports Day",
-    date: "Jun 15, 2024",
-    location: "Bandung",
-    price: "Rp 500.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600& fit=crop",
-  },
-  {
-    id: 4,
-    title: "Music Festival",
-    date: "Jul 20, 2024",
-    location: "Yogyakarta",
-    price: "Rp 1.000.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600& fit=crop", 
-  },
-  {
-    id: 5,
-    title: "Food Festival",
-    date: "Aug 15, 2024",
-    location: "Surabaya",
-    price: "Rp 750.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-  {
-    id: 6,
-    title: "Fashion Show",
-    date: "Sep 20, 2024",
-    location: "Malang",
-    price: "Rp 1.500.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
+interface Event {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  price: string;
+  image: string;
+  description: string;
+}
 
-  },
-  {
-    id: 7,
-    title: "Gaming Tournament",
-    date: "Oct 15, 2024",
-    location: "Semarang",
-    price: "Rp 500.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-    
-  },
-  {
-    id: 8,
-    title: "Art Exhibition",
-    date: "Nov 20, 2024",
-    location: "Bogor",
-    price: "Rp 1.000.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-  {
-    id: 9,
-    title: "Sports Event",
-    date: "Dec 15, 2024",
-    location: "Bandung",
-    price: "Rp 1.500.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-  {
-    id: 10,
-    title: "Music Festival",
-    date: "Jan 15, 2025",
-    location: "Yogyakarta",
-    price: "Rp 1.000.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-  {
-    id: 11,
-    title: "Food Festival",
-    date: "Feb 20, 2025",
-    location: "Surabaya",
-    price: "Rp 500.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-  {
-    id: 12,
-    title: "Cultural Festival",
-    date: "Mar 15, 2025",
-    location: "Malang",
-    price: "Rp 1.000.000",
-    image: "https://images.unsplash.com/photo-1551114443-8a5a 2a2a2a2a?q=80&w=1000&h=600 & fit=crop",
-  },
-];
-
-export default function Home() {
+const Home = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [eventsData, setEventsData] = useState<Event[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [initialToken, setInitialToken] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // State for error handling
+
+  const url = 'http://localhost:5000/api/events';
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = Cookies.get('token') || null;
+    setInitialToken(token);
+    setIsLoggedIn(!!token);
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEventsData(data);
+      } catch (error) {
+        setError((error as Error).message); // Set the error message to state
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const handleAuthClick = () => {
+    Cookies.remove('token'); // Clear the token
+    setIsLoggedIn(false); // Update the logged-in state
+    setIsAuthOpen(false);
+    redirect('http://localhost:3000');
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <MainNav onAuthClick={() => setIsAuthOpen(true)} />
+      {isLoggedIn ? (
+        <MainNavToken onSearch={function (searchTerm: string): void {
+          throw new Error('Function not implemented.');
+        } }  />
+      ) : (
+        <MainNav
+          onAuthClick={() => setIsAuthOpen(true)}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
 
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&h=1200&fit=crop"
             alt="Hero background"
+            width={500}
+            height={500}
             className="w-full h-full object-cover brightness-50"
           />
         </div>
@@ -150,13 +104,17 @@ export default function Home() {
             Join thousands of people discovering unique events every day. Find
             your next unforgettable experience.
           </p>
-          <div className="flex gap-4 ">
-            <Button size="lg" onClick={() => setIsAuthOpen(true)}>
+          <div className="flex gap-4">
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10"
+              onClick={() => setIsAuthOpen(true)}
+            >
               Get Started
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10"><Link href="/events">
-               Browse Events
-                </Link>
+            <Button size="lg" variant="outline" className="bg-white/10">
+              Browser Event
             </Button>
           </div>
         </div>
@@ -199,41 +157,46 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">Featured Events</h2>
-            <Button variant="outline">
-              View All <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
           <Carousel>
             <CarouselContent>
-              {[1, 2, 3,].map((i) => (
-                <CarouselItem key={i} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <img
-                    src={`https://images.unsplash.com/photo-${
-                      i === 3
-                        ? "1540575467063-178a50c2df87"
-                        : i === 2
-                        ? "1523580494863-6f3031224c94"
-                        : "1475721027785-f74eccf877e2"
-                    }?q=80&w=1000&h=600&fit=crop`}
-                    alt={`Event ${i}`}
-                    className="w-full h-48 object-cover"
+              {eventsData.map((event) => (
+                <CarouselItem
+                  key={event.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <Image
+                    src={event.image}
+                    alt={`Event ${event}`}
+                    width={5000}
+                    height={5000}
+                    className="w-full h-60 object-cover"
                   />
                   <div className="p-6">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar className="w-4 h-4" />
-                      <span>Apr 15, 2024</span>
+                      <span>{event.date.split('T')[0]}</span>
                       <MapPin className="w-4 h-4 ml-2" />
-                      <span>Jakarta</span>
+                      <span>{event.location}</span>
                     </div>
                     <h3 className="text-xl font-semibold mb-2">
-                      Tech Innovation Summit 2024
+                      {event.title}
                     </h3>
                     <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                      Join industry leaders for a day of innovation and networking
+                      {event.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold">Rp 1.500.000</span>
-                      <Button variant="outline">View Details</Button>
+                      <span className="font-semibold">
+                        {new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                        }).format(Number(event.price))}
+                      </span>
+                      <Button variant="outline">
+                        <Link href={`/events/${event.id}/Book`}>
+                          View Details
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 </CarouselItem>
@@ -242,7 +205,6 @@ export default function Home() {
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
-
         </div>
       </section>
 
@@ -252,23 +214,37 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-8">Upcoming Events</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {eventsData.map((event) => (
-              <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <img
+              <Card
+                key={event.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <Image
                   src={event.image}
                   alt={event.title}
+                  width={500}
+                  height={500}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <Calendar className="w-4 h-4" />
-                    <span>{event.date}</span>
+                    <span>{event.date.split('T')[0]}</span>
                     <MapPin className="w-4 h-4 ml-2" />
                     <span>{event.location}</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold">{event.price}</span>
-                    <Button variant="outline">View Details</Button>
+                    <span className="font-semibold">
+                      {new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                      }).format(Number(event.price))}
+                    </span>
+                    <Button variant="outline">
+                      <Link href={`/events/${event.id}/Book`}>
+                        View Details
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -277,12 +253,13 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Call to Action Section */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Start Your Journey?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 max-w-2">
             Join our community and discover amazing events happening around you.
           </p>
           <Button
@@ -294,9 +271,11 @@ export default function Home() {
           </Button>
         </div>
       </section>
-      
+
       <AuthDialog open={isAuthOpen} onOpenChange={setIsAuthOpen} />
       <Footer />
     </div>
   );
-}
+};
+
+export default Home;

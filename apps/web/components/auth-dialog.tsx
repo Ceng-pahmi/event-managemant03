@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation"; 
@@ -57,6 +57,10 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({
       password,
     };
 
+    const refreshPage = () => {
+      window.location.reload();
+    }
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -70,8 +74,10 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({
 
       if (response.ok && password === body.password) {
         console.log("Success:", data);
-        Cookies.set("token", data.token);
+        let yuhu = Cookies.set("token", data.token);
+        console.log(yuhu)
         onOpenChange(false);
+        refreshPage()
         router.push("/");
       } else {
         alert("email or password is incorrect");
@@ -118,6 +124,8 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({
       setRole("");
     };
 
+    const refreshPage = () => window.location.reload();
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -132,6 +140,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({
       if (response.ok) {
         console.log("Success:", data);
         onOpenChange(false);
+        refreshPage();
         router.push("/");
       } else if(email === body.email){
         alert("Email already exists");
@@ -259,7 +268,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-neutral-900">
-                    <SelectItem value="admin">admin</SelectItem>
+                    <SelectItem value="Admin">admin</SelectItem>
                     <SelectItem value="User">User</SelectItem>
                     <SelectItem value="EventOrganizer">Event Organizer</SelectItem>
                   </SelectContent>
