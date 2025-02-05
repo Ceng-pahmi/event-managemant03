@@ -16,23 +16,27 @@ model User {
   referral_code String?
   role          String
   events        Event[] @relation("OrganizerEvents")
+  tickets       Ticket[] @relation("UserTickets") // Added relation to Ticket
   @@map("users")
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  image       String?
-  date        DateTime
-  time        String
-  location    String
-  price       Float
-  category    String
-  organizerId Int
-  organizer   User?    @relation("OrganizerEvents", fields: [organizerId], references: [id])
-  reviews     Review[]
-  promotions  Promotion[]
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String
+  image           String?
+  date            DateTime
+  time            String
+  location        String
+  price           Float
+  priceFormatted  String
+  attendees       String
+  category        String
+  organizerId     Int
+  organizer       User?    @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  reviews         Review[]
+  promotions      Promotion[]
+  tickets         Ticket[]  // Added relation to Ticket
   @@map("events")
 }
 
@@ -47,6 +51,17 @@ model Promotion {
   event             Event?   @relation(fields: [eventId], references: [id])
   eventId          Int?
   @@map("promotions")
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  eventId    Int
+  userId     Int
+  quantity    Int
+  purchaseDate DateTime @default(now())
+  event      Event     @relation(fields: [eventId], references: [id])
+  user       User      @relation("UserTickets", fields: [userId], references: [id])
+  @@map("tickets")
 }
 
 model Review {

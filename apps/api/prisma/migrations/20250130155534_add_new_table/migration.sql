@@ -16,29 +16,17 @@ CREATE TABLE "events" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "location" TEXT NOT NULL,
+    "image" TEXT,
     "date" TIMESTAMP(3) NOT NULL,
-    "isFree" BOOLEAN NOT NULL,
-    "price" INTEGER NOT NULL,
-    "image" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
+    "time" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "priceFormatted" TEXT NOT NULL,
+    "attendees" INTEGER NOT NULL,
+    "category" TEXT NOT NULL,
     "organizerId" INTEGER NOT NULL,
 
     CONSTRAINT "events_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "tickets" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-    "quantity" INTEGER NOT NULL,
-    "description" TEXT NOT NULL,
-    "eventId" INTEGER,
-
-    CONSTRAINT "tickets_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -72,9 +60,6 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
 ALTER TABLE "events" ADD CONSTRAINT "events_organizerId_fkey" FOREIGN KEY ("organizerId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "tickets" ADD CONSTRAINT "tickets_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "events"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "promotions" ADD CONSTRAINT "promotions_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "events"("id") ON DELETE SET NULL ON UPDATE CASCADE;
